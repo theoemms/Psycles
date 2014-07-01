@@ -20,3 +20,6 @@
 *.out
 *.app
 *.bin
+
+#Project Files
+*.cbp
