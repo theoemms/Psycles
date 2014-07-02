@@ -1,81 +1,82 @@
 #include "includes.h"
 
-Drawable::Drawable()
+Drawable::Drawable() //Set the position and rotation to (0, 0, 0)
 {
-    for(int i = 0; i < 3; i++)
-    {
-        this->position[i] = 0;
-        this->rotation[i] = 0;
-    }
+    this->position = Vector3(0, 0, 0);
+    this->rotation = Vector3(0, 0, 0);
 }
 
-Drawable::~Drawable()
+Drawable::~Drawable() //Nothing to free here
 {
 
 }
 
-void Drawable::Translate()
+void Drawable::Translate() //Perform the default translation.
 {
-    glTranslatef(this->position[0], this->position[1], this->position[2]);
-    glRotatef(this->rotation[0], 1, 0, 0);
-    glRotatef(this->rotation[1], 0, 1, 0);
-    glRotatef(this->rotation[2], 0, 0, 1);
+    glTranslatef(this->position.x, this->position.y, this->position.z);
+    glRotatef(this->rotation.x, 1, 0, 0);
+    glRotatef(this->rotation.y, 0, 1, 0);
+    glRotatef(this->rotation.z, 0, 0, 1);
 }
 
-Teapot::Teapot()
-{
-
-}
-
-Teapot::~Teapot()
+Teapot::Teapot() //Teapot is simple, it just uses the default constructor
 {
 
 }
 
-bool Teapot::Draw() //Matrix mode must be modelview
+Teapot::~Teapot() //Nothing to free here
 {
-    glPushMatrix();
-    this->Translate();
-    glFrontFace(GL_CW);
-    glutSolidTeapot(1);
-    glFrontFace(GL_CCW);
-    glPopMatrix();
+
+}
+
+bool Teapot::Draw() //Draw a teapot (Assumes matrix mode is modelview and
+                    //translation to scene coordinates had been made)
+{
+    glPushMatrix(); //Ensure only this object is translated by saving the last translation
+    this->Translate(); //Do translation.
+    glFrontFace(GL_CW); //glutSolidTeapot has backwards vertex winding.
+    glutSolidTeapot(1); //Draw teapot.
+    glFrontFace(GL_CCW); //restore normal vertes winding
+    glPopMatrix(); //Restore the old translation matrix
     return true;
 }
 
 
-Surface::Surface()
+Surface::Surface() //Nothing to be done. (This should allow an array of points and normals to be passed in)
 {
 }
 
-Surface::~Surface()
+Surface::~Surface() //The points and normals are set by malloc so must be freed
 {
     free(this->points);
     free(this->normals);
 }
 
-bool Surface::Draw() //Matrix mode must be modelview
+bool Surface::Draw() //Iterate over points and draw.
 {
+    //See comments in Teapot::Draw for exaplanation:
     glPushMatrix();
     this->Translate();
     glBegin(GL_TRIANGLES);
+
+    //We must save these pointers so that they can be freed
     GLfloat* glPoint;
     GLfloat* glNormal;
-        for (int i = 0; i < this->numPoints; i++)
+        for (int i = 0; i < this->numPoints; i++) //Go through the vertices in order
         {
-            glPoint = this->points[i].ToGLFloat3();
+            glPoint = this->points[i].ToGLFloat3(); //Make our Vector3 into a Glfloat3*
             glNormal = this->normals[i].ToGLFloat3();
-            glNormal3fv(glNormal);
-            glVertex3fv(glPoint);
-            free(glPoint);
+            glNormal3fv(glNormal); //Set the corresponding normal
+            glVertex3fv(glPoint); //Draw the vertex
+            free(glPoint); //Free the memory
             free(glNormal);
         }
-    if(this->doubleSided)
+    if(this->doubleSided) //If the surface is two sided draw all the faces again but facing backwards
     {
-        for (int i = this->numPoints - 1; i >=0 ; i--)
+        for (int i = this->numPoints - 1; i >=0 ; i--)//Go through vertices backwards
         {
             glPoint = this->points[i].ToGLFloat3();
-            glNormal = this->normals[i].ToGLFloat3();
+            glNormal = (-this->normals[i]).ToGLFloat3(); //Draw with normals reversed
             glNormal3fv(glNormal);
             glVertex3fv(glPoint);
             free(glPoint);
@@ -87,7 +88,7 @@ bool Surface::Draw() //Matrix mode must be modelview
     return true;
 }
 
-Triangle::Triangle()
+Triangle::Triangle()//This function is pretty self exaplanatory. It sets the triangle's vertices and makes it double sided.
 {
     this->numPoints = 3;
     this->points = (Vector3*) malloc(sizeof(Vector3) * numPoints);
@@ -107,7 +108,6 @@ Triangle::Triangle()
 
 Triangle::~Triangle()
 {
-
 }
 
 

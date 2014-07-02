@@ -5,8 +5,8 @@
 class Drawable
 {
     public:
-        float position[3];
-        float rotation[3];
+        Vector3 position;
+        Vector3 rotation;
         Drawable();
         virtual ~Drawable();
         virtual bool Draw() = 0;
