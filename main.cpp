@@ -37,13 +37,19 @@ void draw() //This is called during every frame in order to first draw the scene
 
     camera.Translate(); //Translate to Scene coordinates
 
-    for(int i = 0; i < MAX_LIGHTS; i++)
+    for(int i = 0; i < MAX_LIGHTS; i++) //Set the lights positions.
     {
         if(lights[i] != NULL) lights[i]->GLSetPosition();
     }
+
     for(int i = 0; i < MAX_DRAWABLES; i++) //Iterate over all the objects we wish to draw.
     {
-        if (drawables[i] != NULL) drawables[i]->Draw(); //If they exist, draw them.
+        if (drawables[i] != NULL)//If they exist, draw them.
+        {
+            glPushMatrix(); //Do not allow an objects draw call to transform anything other than itself.
+            drawables[i]->Draw();
+            glPopMatrix();
+        }
     }
     glutSwapBuffers(); //Present our back buffer to the screen and pull the previous frame into the back buffer
 }

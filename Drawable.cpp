@@ -29,16 +29,13 @@ Teapot::~Teapot() //Nothing to free here
 
 }
 
-bool Teapot::Draw() //Draw a teapot (Assumes matrix mode is modelview and
+void Teapot::Draw() //Draw a teapot (Assumes matrix mode is modelview and
                     //translation to scene coordinates had been made)
 {
-    glPushMatrix(); //Ensure only this object is translated by saving the last translation
     this->Translate(); //Do translation.
     glFrontFace(GL_CW); //glutSolidTeapot has backwards vertex winding.
     glutSolidTeapot(1); //Draw teapot.
     glFrontFace(GL_CCW); //restore normal vertes winding
-    glPopMatrix(); //Restore the old translation matrix
-    return true;
 }
 
 
@@ -52,10 +49,8 @@ Surface::~Surface() //The points and normals are set by malloc so must be freed
     free(this->normals);
 }
 
-bool Surface::Draw() //Iterate over points and draw.
+void Surface::Draw() //Iterate over points and draw.
 {
-    //See comments in Teapot::Draw for exaplanation:
-    glPushMatrix();
     this->Translate();
     glBegin(GL_TRIANGLES);
 
@@ -84,8 +79,6 @@ bool Surface::Draw() //Iterate over points and draw.
         }
     }
     glEnd();
-    glPopMatrix();
-    return true;
 }
 
 Triangle::Triangle()//This function is pretty self exaplanatory. It sets the triangle's vertices and makes it double sided.

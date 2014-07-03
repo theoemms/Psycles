@@ -9,7 +9,7 @@ class Drawable
         Vector3 rotation;
         Drawable();
         virtual ~Drawable();
-        virtual bool Draw() = 0;
+        virtual void Draw() = 0;
         virtual void Translate();
     protected:
     private:
@@ -21,7 +21,7 @@ class Teapot : public Drawable
   public:
     Teapot();
     virtual ~Teapot();
-    virtual bool Draw();
+    virtual void Draw();
   protected:
   private:
 };
@@ -33,7 +33,7 @@ class Surface : public Drawable
     bool doubleSided;
     Surface();
     virtual ~Surface();
-    virtual bool Draw();
+    virtual void Draw();
   protected:
     Vector3* points;
     Vector3* normals;
