@@ -25,6 +25,8 @@ Drawable* drawables[MAX_DRAWABLES];
 Light* lights[MAX_LIGHTS];
 Light* light1, * light2;
 
+Camera camera = Camera(Vector3(2, 0, 16), Vector3(0, 270, 0), false, 45, 3, 50); //The scene's camera
+
 void draw() //This is called during every frame in order to first draw the scene to the
             //back buffer, then swap the front and back buffers.
 {
@@ -32,7 +34,8 @@ void draw() //This is called during every frame in order to first draw the scene
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //delete the previous frame
     glMatrixMode(GL_MODELVIEW); //Tell openGL we want to do transformations on the scene.
     glLoadIdentity(); //Create a new matrix to work from.
-    gluLookAt(2, 8, 16, 0, 0, 0, 0, 1, 0); //Transform from camera space to scene space
+
+    camera.Translate(); //Translate to Scene coordinates
 
     for(int i = 0; i < MAX_LIGHTS; i++)
     {
@@ -58,6 +61,10 @@ void idle() //This function runs when GLUT has nothing else to do. It's used for
     triangle->rotation.y -= 7.5; //spin the triangle
     if (triangle->rotation.y  <= 0) //clamp as before
         triangle->rotation.y  += 360;
+
+    camera.rotation.y += 2.5; //spin the camera
+    if (camera.rotation.y  >= 360) //clamp as before
+        camera.rotation.y  -= 360;
 
     glutPostRedisplay(); //Tell openGL the scene has been changed and therefore needs redrawing.
 }
@@ -91,10 +98,10 @@ void init() //Get everything ready to go.
     lights[0] = light1;
     lights[1] = light2;
 
-    glEnable(GL_LIGHTING); //Let there be light
+    glEnable(GL_LIGHTING);      //Let there be light
     glEnable(GL_DEPTH_TEST);    //Let there be depth testing!
                                 //(OpenGL needs to work out wich parts of the scene aren't behind other objects)
-    glEnable(GL_CULL_FACE); //Don't draw the insides of objects
+    glEnable(GL_CULL_FACE);     //Don't draw the insides of objects
     glCullFace(GL_BACK);
     glFrontFace(GL_CCW);
 }
@@ -103,8 +110,7 @@ void reshape(int width, int height) //This function is called when the window is
 {
     glViewport(0, 0, width, height); //Set the area of the window to draw in to be the whole window
     glMatrixMode(GL_PROJECTION); //Make sure the scene is projected onto the screen with the correst aspect ratio
-    glLoadIdentity();
-    gluPerspective(45, (float) width / height , 5, 30);
+    camera.SetProjection((float) width / height);
 }
 
 
@@ -118,12 +124,12 @@ glutInitWindowPosition(50,50);
 glutInitWindowSize(500, 500);
 glutCreateWindow("Psycles - Non euclidean horror.");
 
+init(); //Set up the scene and enable openGL features
+
 //Register idle(), display() and reshape()
 glutIdleFunc(idle);
 glutDisplayFunc(draw);
 glutReshapeFunc(reshape);
-
-init(); //Set up the scene and enable openGL features
 
 glutMainLoop(); //Start the GLUT event loop
 

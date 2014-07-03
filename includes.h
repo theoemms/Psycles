@@ -6,5 +6,6 @@
 #include "Drawable.h"
 #include "Light.h"
 #include "Game.h"
+#include "Camera.h"
 
 #endif
