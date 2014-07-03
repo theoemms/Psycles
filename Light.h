@@ -11,18 +11,22 @@ class Light
         Vector3 position;
         bool directional;
 
-        GLfloat diffuseColour[4];
-        GLfloat specularColour[4];
-        GLfloat ambientColour[4];
-
         Light(Vector3 Position, bool isDirectional, GLenum lightNumber);
         virtual ~Light();
         void Initialize();
-        void GLSetColour();
+
+        void SetAmbientColour(GLfloat R, GLfloat G, GLfloat B, GLfloat A);
+        void SetDiffuseColour(GLfloat R, GLfloat G, GLfloat B, GLfloat A);
+        void SetSpecularColour(GLfloat R, GLfloat G, GLfloat B, GLfloat A);
+
         void GLSetPosition();
 
     protected:
     private:
+        GLfloat specularColour[4];
+        GLfloat ambientColour[4];
+        GLfloat diffuseColour[4];
+
         GLfloat* GetGLPosition();
 };
 

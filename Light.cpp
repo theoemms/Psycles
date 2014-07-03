@@ -5,6 +5,11 @@ Light::Light(Vector3 Position, bool isDirectional, GLenum lightNumber)
     this->directional = isDirectional;
     this->position = Position;
     this->lightNum = lightNumber;
+    for(int i = 0; i < 4; i++)
+    {
+        this->ambientColour[i] = this->diffuseColour[i] = this->specularColour[i] = 1;
+    }
+    glEnable(this->lightNum);
 }
 
 Light::~Light()
@@ -12,10 +17,29 @@ Light::~Light()
     //dtor
 }
 
-void Light::GLSetColour()
+void Light::SetAmbientColour(GLfloat R, GLfloat G, GLfloat B, GLfloat A)
 {
+    this->ambientColour[0] = R;
+    this->ambientColour[1] = G;
+    this->ambientColour[2] = B;
+    this->ambientColour[3] = A;
     glLightfv(this->lightNum, GL_AMBIENT, this->ambientColour);
+}
+void Light::SetDiffuseColour(GLfloat R, GLfloat G, GLfloat B, GLfloat A)
+{
+    this->diffuseColour[0] = R;
+    this->diffuseColour[1] = G;
+    this->diffuseColour[2] = B;
+    this->diffuseColour[3] = A;
     glLightfv(this->lightNum, GL_DIFFUSE, this->diffuseColour);
+
+}
+void Light::SetSpecularColour(GLfloat R, GLfloat G, GLfloat B, GLfloat A)
+{
+    this->specularColour[0] = R;
+    this->specularColour[1] = G;
+    this->specularColour[2] = B;
+    this->specularColour[3] = A;
     glLightfv(this->lightNum, GL_SPECULAR, this->specularColour);
 }
 
