@@ -30,13 +30,13 @@ class Game
         static void Fatal(const string error);
 
         //Register and unregister functions;
-        void RegisterDrawable(Drawable* drawable);
-        void RegisterLight(Light* light);
-        //void RegisterConstraint(Constraint* constraint);
+        uint RegisterDrawable(Drawable* drawable, string name);
+        uint RegisterLight(Light* light, string name);
+        //uint RegisterConstraint(Constraint* constraint, string name);
 
         void UnregisterDrawable(Drawable* drawable);
         void UnregisterLight(Light* light);
-        //void UnregisterConstraint(Constraint* constraint);
+        //void  UnregisterConstraint(Constraint* constraint);
 
     protected:
     private:
@@ -44,16 +44,6 @@ class Game
         Drawable* drawables[MAX_DRAWABLES];
         Light* lights[MAX_LIGHTS];
         //Constraint* constraints[MAX_CONSTRAINTS];
-
-        //These are used to do a Hooke's law style physics simulation on the teapot (in idle());
-        Vector3 acceleration;
-        Vector3 velocity;
-
-        //The Drawable objects in the scene.
-        Teapot* teapot;
-        Triangle* triangle;
-
-        Light* light1, * light2;
 
         //This is to make OpenGL play with C++... Messy.
 

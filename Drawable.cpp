@@ -4,6 +4,7 @@ Drawable::Drawable() //Set the position and rotation to (0, 0, 0)
 {
     this->position = Vector3(0, 0, 0);
     this->rotation = Vector3(0, 0, 0);
+    this->scale = 1;
 }
 
 Drawable::~Drawable() //Nothing to free here
@@ -17,6 +18,7 @@ void Drawable::Translate() //Perform the default translation.
     glRotatef(this->rotation.x, 1, 0, 0);
     glRotatef(this->rotation.y, 0, 1, 0);
     glRotatef(this->rotation.z, 0, 0, 1);
+    glScalef(this->scale, this->scale, this->scale);
 }
 
 Teapot::Teapot() //Teapot is simple, it just uses the default constructor
@@ -106,6 +108,29 @@ Triangle::~Triangle()
 
 Plane::Plane()
 {
+    this->numPoints = 6;
+    this->points = (Vector3*) malloc(sizeof(Vector3) * numPoints);
+    this->normals = (Vector3*) malloc(sizeof(Vector3) * numPoints);
+
+    this->points[0] = Vector3(-1, 0, -1);
+    this->normals[0] = Vector3(0, 1, 0);
+
+    this->points[2] = Vector3(1, 0, -1);
+    this->normals[2] = Vector3(0, 1, 0);
+
+    this->points[1] = Vector3(-1, 0, 1);
+    this->normals[1] = Vector3(0, 1, 0);
+
+    this->points[3] = Vector3(-1, 0, 1);
+    this->normals[3] = Vector3(0, 1, 0);
+
+    this->points[5] = Vector3(1, 0, -1);
+    this->normals[5] = Vector3(0, 1, 0);
+
+    this->points[4] = Vector3(1, 0, 1);
+    this->normals[4] = Vector3(0, 1, 0);
+
+    this->doubleSided = false;
 }
 
 Plane::~Plane()

@@ -7,6 +7,7 @@ class Drawable
     public:
         Vector3 position;
         Vector3 rotation;
+        float scale;
         Drawable();
         virtual ~Drawable();
         virtual void Draw() = 0;

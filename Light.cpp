@@ -9,7 +9,6 @@ Light::Light(Vector3 Position, bool isDirectional, GLenum lightNumber)
     {
         this->ambientColour[i] = this->diffuseColour[i] = this->specularColour[i] = 1;
     }
-    glEnable(this->lightNum);
 }
 
 Light::~Light()

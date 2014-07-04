@@ -15,14 +15,11 @@ Game::Game()
     {
         this->lights[i] = NULL;
     }
-
-    this->acceleration = Vector3(0, 0, 0);
-    this->velocity = Vector3(9, 0, 0);
 }
 
 Game::~Game()
 {
-    //dtor
+    delete this->camera;
 }
 
 void Game::Initiallise(int argc, char **argv)
@@ -34,26 +31,7 @@ void Game::Initiallise(int argc, char **argv)
     glutInitWindowSize(500, 500);
     glutCreateWindow("Psycles - Non euclidean horror.");
 
-    this->light1 = new Light(Vector3(5, 1, 2), false, GL_LIGHT0);
-    this->light1->SetAmbientColour(0, 0, 0.1f, 1);
-    this->light1->SetDiffuseColour(0.4f, 0.35f, 0.3f, 1);
-    this->light1->SetSpecularColour(0.3f, 0.3f, 0.3f, 1);
-
-    this->light2 = new Light(Vector3(-5, 1, 2), false, GL_LIGHT1);
-    this->light2->SetAmbientColour(0, 0, 0.1f, 1);
-    this->light2->SetDiffuseColour(0.2f, 0.2f, 0.25f, 1);
-    this->light2->SetSpecularColour(0, 0, 0, 1);
-
-    this->lights[0] = light1;
-    this->lights[1] = light2;
-
-    this->camera = new Camera(Vector3(2, 4, 16), Vector3(0, 0, 0), true, 45, 3, 50);
-
-    this->teapot = new Teapot(); //Make a new teapot;
-    this->triangle = new Triangle(); //Make a new triangle;
-    this->teapot->position.z = 3; //Give the teapot a non-zero position in the z direction
-    this->drawables[0] = teapot; //Set the teapot and triangle to be drawn every frame
-    this->drawables[1] = triangle;
+    this->camera = new Camera(Vector3(2, 0, 16), Vector3(0, 0, 0), true, 45, 3, 50);
 
     glEnable(GL_LIGHTING);      //Let there be light
     glEnable(GL_DEPTH_TEST);    //Let there be depth testing!
@@ -74,17 +52,6 @@ void Game::Run()
 
 void Game::Update()
 {
-    this->teapot->rotation.y += 5; //spin the teapot.
-    if (this->teapot->rotation.y  >= 360.0f) //clamp the angle to 0 <= x < 360
-        this->teapot->rotation.y  -= 360;
-
-    this->acceleration = -this->teapot->position; //Hooke's law
-    this->velocity += this->acceleration * 0.01;
-    this->teapot->position += this->velocity * 0.01;
-
-    this->triangle->rotation.y -= 7.5; //spin the triangle
-    if (this->triangle->rotation.y  <= 0) //clamp as before
-        this->triangle->rotation.y  += 360;
 
     glutPostRedisplay(); //Tell openGL the scene has been changed and therefore needs redrawing.
 }
@@ -138,26 +105,96 @@ void Game::Fatal(const string error)
     exit(1);
 }
 
-void Game::RegisterDrawable(Drawable* drawable)
+uint Game::RegisterDrawable(Drawable* drawable, string name)
 {
-
+    bool isAlreadyRegistered = false;
+    for(int i = 0; i < MAX_DRAWABLES; i++) //Scan through the list to check if the drawable is in there.
+    {
+        isAlreadyRegistered = isAlreadyRegistered | (drawable == this->drawables[i]);
+    }
+    if(isAlreadyRegistered)
+    {
+        Game::Warn("Drawable already registered: " + name);
+    }
+    else
+    {
+        bool success = false;
+        uint index;
+        for(int i = 0; i < MAX_DRAWABLES; i++) //Scan through the list to find a space
+        {
+            if(drawables[i] == NULL) //if you find one
+            {
+                index = i; //remember where you put it
+                drawables[i] = drawable; //put it there
+                success = true; //remember that you put it
+                break; //stop looking
+            }
+        }
+        if(!success) Game::Fatal("Drawable memory full. Could not add "); //if there was no space, panic!
+        else return index; //give back the index so we can deassign
+    }
 }
 
-void Game::RegisterLight(Light* light)
+uint Game::RegisterLight(Light* light, string name)
 {
-
+    glEnable(light->lightNum);
+    bool isAlreadyRegistered = false;
+    for(int i = 0; i < MAX_LIGHTS; i++) //Scan through the list to check if the drawable is in there.
+    {
+        isAlreadyRegistered = isAlreadyRegistered | (light == this->lights[i]);
+    }
+    if(isAlreadyRegistered)
+    {
+        Game::Warn("Light already registered: " + name);
+    }
+    else
+    {
+        bool success = false;
+        uint index;
+        for(int i = 0; i < MAX_LIGHTS; i++) //Scan through the list to check if the drawable is in there.
+        {
+            if(lights[i] == NULL)
+            {
+                index == i;
+                lights[i] = light;
+                success = true;
+                break;
+            }
+        }
+        if(!success) Game::Fatal("Too many lights assigned!");
+        else return index;
+    }
 }
 
 //void RegisterConstraint(Constraint* constraint){}
 
 void Game::UnregisterDrawable(Drawable* drawable)
 {
-
+    bool success = false;
+    for (int i = 0; i < MAX_DRAWABLES; i++)
+    {
+        if(drawable == drawables[i])
+        {
+            drawables[i] = NULL;
+            success = true;
+        }
+    }
+    if (!success) Game::Warn("Tried to remove non existent drawable!");
 }
 
 void Game::UnregisterLight(Light* light)
 {
-
+    glDisable(light->lightNum);
+    bool success = false;
+    for (int i = 0; i < MAX_LIGHTS; i++)
+    {
+        if(light = lights[i])
+        {
+            lights[i] = NULL;
+            success = true;
+        }
+    }
+    if (!success) Game::Warn("Tried to remove non existent light!");
 }
 
 //void UnregisterConstraint(Constraint* constraint){}
@@ -176,5 +213,3 @@ void Game::idleCallback()
 {
     game->Update();
 }
-
-
