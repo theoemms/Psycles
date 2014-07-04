@@ -4,6 +4,7 @@
 #include<GL/glut.h>
 #include "Vector3.h"
 #include "Drawable.h"
+#include "Updatable.h"
 #include "Light.h"
 #include "Camera.h"
 #include "Game.h"

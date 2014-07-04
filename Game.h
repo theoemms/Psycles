@@ -3,7 +3,7 @@
 
 #define MAX_DRAWABLES 32
 #define MAX_LIGHTS 16
-#define MAX_CONSTRAINTS 64
+#define MAX_UPDATABLES 64
 
 #include<string>
 
@@ -32,25 +32,23 @@ class Game
         //Register and unregister functions;
         uint RegisterDrawable(Drawable* drawable, string name);
         uint RegisterLight(Light* light, string name);
-        //uint RegisterConstraint(Constraint* constraint, string name);
+        uint RegisterUpdatable(Updatable* updatable, string name);
 
         void UnregisterDrawable(Drawable* drawable);
         void UnregisterLight(Light* light);
-        //void  UnregisterConstraint(Constraint* constraint);
+        void UnregisterUpdatable(Updatable* updatable);
 
     protected:
     private:
         //The objects to be drawn, the lights to use in shading and any constraints to apply.
         Drawable* drawables[MAX_DRAWABLES];
         Light* lights[MAX_LIGHTS];
-        //Constraint* constraints[MAX_CONSTRAINTS];
+        Updatable* updatables[MAX_UPDATABLES];
 
-        //This is to make OpenGL play with C++... Messy.
-
+        //This is to make OpenGL play with C++... Messy. Essentially maps Update, Draw etc. to these static functions
+        //(Means only one instance of Game can exist)
         static void drawCallback();
-
         static void reshapeCallback(GLint width, GLint height);
-
         static void idleCallback();
 };
 

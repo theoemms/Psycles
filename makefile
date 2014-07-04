@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -lGL -lGLU -lglut
-SOURCES = Drawable.cpp Game.cpp Vector3.cpp Light.cpp main.cpp Camera.cpp
-DEPENDENCIES = Drawable.h Game.h Vector3.h Light.h Camera.h globals.h
+SOURCES = Drawable.cpp Updatable.cpp Game.cpp Vector3.cpp Light.cpp Camera.cpp main.cpp
+DEPENDENCIES = Drawable.h Updatable.h Game.h Vector3.h Light.h Camera.h
 EXEC_NAME32 = bin/x86/psycles
 EXEC_NAME64 = bin/x64/psycles
 

@@ -15,6 +15,10 @@ Game::Game()
     {
         this->lights[i] = NULL;
     }
+    for(int i = 0; i < MAX_UPDATABLES; i++)
+    {
+        this->updatables[i] = NULL;
+    }
 }
 
 Game::~Game()
@@ -52,8 +56,15 @@ void Game::Run()
 
 void Game::Update()
 {
-
     glutPostRedisplay(); //Tell openGL the scene has been changed and therefore needs redrawing.
+
+    float deltaT = 0.05;
+
+    for(int i = 0; i < MAX_UPDATABLES; i++)
+    {
+        if(updatables[i] != NULL)
+            updatables[i]->Update(deltaT);
+    }
 }
 
 void Game::Draw()
@@ -130,8 +141,8 @@ uint Game::RegisterDrawable(Drawable* drawable, string name)
                 break; //stop looking
             }
         }
-        if(!success) Game::Fatal("Drawable memory full. Could not add "); //if there was no space, panic!
-        else return index; //give back the index so we can deassign
+        if(!success) Game::Fatal("Drawable memory full. Could not add " + name + "."); //if there was no space, panic!
+        else return index; //give back the index so we can deassign quickly
     }
 }
 
@@ -166,7 +177,35 @@ uint Game::RegisterLight(Light* light, string name)
     }
 }
 
-//void RegisterConstraint(Constraint* constraint){}
+uint Game::RegisterUpdatable(Updatable* updatable, string name)
+{
+    bool isAlreadyRegistered = false;
+    for(int i = 0; i < MAX_UPDATABLES; i++) //Scan through the list to check if the drawable is in there.
+    {
+        isAlreadyRegistered = isAlreadyRegistered | (updatable == this->updatables[i]);
+    }
+    if(isAlreadyRegistered)
+    {
+        Game::Warn("Drawable already registered: " + name);
+    }
+    else
+    {
+        bool success = false;
+        uint index;
+        for(int i = 0; i < MAX_UPDATABLES; i++) //Scan through the list to find a space
+        {
+            if(updatables[i] == NULL) //if you find one
+            {
+                index = i; //remember where you put it
+                updatables[i] = updatable; //put it there
+                success = true; //remember that you put it
+                break; //stop looking
+            }
+        }
+        if(!success) Game::Fatal("Updatable memory full. Could not add " + name + "."); //if there was no space, panic!
+        else return index; //give back the index so we can deassign
+    }
+}
 
 void Game::UnregisterDrawable(Drawable* drawable)
 {
@@ -177,6 +216,7 @@ void Game::UnregisterDrawable(Drawable* drawable)
         {
             drawables[i] = NULL;
             success = true;
+            //note, we don't break this way if any duplicate additions happen they are removed.
         }
     }
     if (!success) Game::Warn("Tried to remove non existent drawable!");
@@ -192,12 +232,26 @@ void Game::UnregisterLight(Light* light)
         {
             lights[i] = NULL;
             success = true;
+            //note, we don't break this way if any duplicate additions happen they are removed.
         }
     }
     if (!success) Game::Warn("Tried to remove non existent light!");
 }
 
-//void UnregisterConstraint(Constraint* constraint){}
+void Game::UnregisterUpdatable(Updatable* updatable)
+{
+    bool success = false;
+    for (int i = 0; i < MAX_UPDATABLES; i++)
+    {
+        if(updatable = updatables[i])
+        {
+            updatables[i] = NULL;
+            success = true;
+            //note, we don't break this way if any duplicate additions happen they are removed.
+        }
+    }
+    if (!success) Game::Warn("Tried to remove non existent updatable!");
+}
 
 void Game::drawCallback()
 {
