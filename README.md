@@ -5,7 +5,7 @@ Psycles horror game.
 
 Programming Team:
 
-Theodore Emms & Cesar Roux De Buisson.
+Theodore Emms & César Roux De Buisson.
 
 Artists:
 
