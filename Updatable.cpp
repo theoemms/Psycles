@@ -1,8 +1,11 @@
 #include "includes.h"
+#include<string>
 
-Updatable::Updatable()
+using namespace std;
+
+Updatable::Updatable(string Name)
 {
-    //ctor
+    this->name = Name;
 }
 
 Updatable::~Updatable()
@@ -10,7 +13,7 @@ Updatable::~Updatable()
     //dtor
 }
 
-ScaleAnimation::ScaleAnimation(float* target, float Speed)
+ScaleAnimation::ScaleAnimation(float* target, float Speed, string name) : Updatable(name)
 {
     this->var = target;
     this->speed = Speed;

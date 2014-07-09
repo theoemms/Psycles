@@ -12,23 +12,9 @@ Plane* plane;
 
 Light* light1, * light2;
 
-ScaleAnimation* scaleTeapot;
-
 void cleanup()
 {
     delete game, light1, light2, triangle, teapot, plane;
-}
-
-void mouse(GLint button, GLint state, GLint x, GLint y)
-{
-    if(button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
-    {
-        game->RegisterUpdatable(scaleTeapot, "teapot scale");
-    }
-    if(button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN)
-    {
-        game->UnregisterUpdatable(scaleTeapot);
-    }
 }
 
 int main(int argc, char **argv) //Nice and general, all implementation details abstracted out.
@@ -36,8 +22,6 @@ int main(int argc, char **argv) //Nice and general, all implementation details a
     atexit(cleanup);
     game = new Game();
     game->Initiallise(argc, argv);
-
-    glutMouseFunc(mouse); //*cough*
 
     Game::Report("");
 
@@ -63,7 +47,11 @@ int main(int argc, char **argv) //Nice and general, all implementation details a
 
     teapot2->position = Vector3(2, 2, 2);
 
-    scaleTeapot = new ScaleAnimation(&teapot2->scale, 0.5);
+    ScaleAnimation* moveCam = new ScaleAnimation(&game->camera->position.z, -2, "Camera forwards animation");
+    OnKeyHold* moveCamEvent = new OnKeyHold('w', moveCam);
+
+    ScaleAnimation* moveCamBack = new ScaleAnimation(&game->camera->position.z, 2, "Camera backwards animation");
+    OnKeyHold* moveCamBackEvent = new OnKeyHold('s', moveCamBack);
 
     game->RegisterDrawable(teapot2, "another teapot");
     game->RegisterDrawable(teapot, "Teapot");
@@ -71,7 +59,8 @@ int main(int argc, char **argv) //Nice and general, all implementation details a
     game->RegisterDrawable(plane, "Plane");
     game->RegisterLight(light1, "Sun");
     game->RegisterLight(light2, "Sky Reflection");
-    game->RegisterUpdatable(scaleTeapot, "teapot scale");
+    game->RegisterKeyboardEvent(moveCamEvent, "Move camera forwards.");
+    game->RegisterKeyboardEvent(moveCamBackEvent, "Move camera backwards.");
 
     game->Run();
 

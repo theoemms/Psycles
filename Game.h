@@ -4,6 +4,7 @@
 #define MAX_DRAWABLES 32
 #define MAX_LIGHTS 16
 #define MAX_UPDATABLES 64
+#define MAX_KEYEVENTS 32
 
 #include<string>
 
@@ -24,6 +25,10 @@ class Game
         void Draw(); //GLUTs display callback
         void Reshape(GLint width, GLint height); //GLUTs reshape callback
 
+        //Keyboard input functions
+        void KeyDown(char Key, GLint x, GLint y);
+        void KeyUp(char Key, GLint x, GLint y);
+
         //Error reporting functions.
         static void Report(const string message);
         static void Warn(const string warning);
@@ -32,24 +37,29 @@ class Game
         //Register and unregister functions;
         uint RegisterDrawable(Drawable* drawable, string name);
         uint RegisterLight(Light* light, string name);
-        uint RegisterUpdatable(Updatable* updatable, string name);
+        uint RegisterUpdatable(Updatable* updatable);
+        uint RegisterKeyboardEvent(KeyboardEvent* event, string name);
 
         void UnregisterDrawable(Drawable* drawable);
         void UnregisterLight(Light* light);
         void UnregisterUpdatable(Updatable* updatable);
-
+        void UnregisterKeyboardEvent(KeyboardEvent* event);
     protected:
     private:
         //The objects to be drawn, the lights to use in shading and any constraints to apply.
         Drawable* drawables[MAX_DRAWABLES];
         Light* lights[MAX_LIGHTS];
         Updatable* updatables[MAX_UPDATABLES];
+        KeyboardEvent* keyboardEvents[MAX_KEYEVENTS];
 
         //This is to make OpenGL play with C++... Messy. Essentially maps Update, Draw etc. to these static functions
         //(Means only one instance of Game can exist)
         static void drawCallback();
         static void reshapeCallback(GLint width, GLint height);
         static void idleCallback();
+        static void keyUpCallback(unsigned char Key, GLint x, GLint y);
+        static void keyDownCallback(unsigned char Key, GLint x, GLint y);
+
 };
 
 extern Game* game; //Global pointer to the game.

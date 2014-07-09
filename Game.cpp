@@ -1,6 +1,6 @@
 #include "includes.h"
-#include<iostream>
 
+#include<iostream>
 #include<string>
 
 using namespace std;
@@ -11,13 +11,17 @@ Game::Game()
     {
         this->drawables[i] = NULL;
     }
-    for(int i = 0; i < MAX_LIGHTS; i++)
+    for(int i = 0; i < MAX_LIGHTS; i++) //Do the same for lights
     {
         this->lights[i] = NULL;
     }
-    for(int i = 0; i < MAX_UPDATABLES; i++)
+    for(int i = 0; i < MAX_UPDATABLES; i++) //Do the same for updatables
     {
         this->updatables[i] = NULL;
+    }
+    for(int i = 0; i < MAX_KEYEVENTS; i++) //Do the same for keyboard events
+    {
+        this->keyboardEvents[i] = NULL;
     }
 }
 
@@ -47,6 +51,8 @@ void Game::Initiallise(int argc, char **argv)
     glutDisplayFunc(Game::drawCallback);
     glutIdleFunc(Game::idleCallback);
     glutReshapeFunc(Game::reshapeCallback);
+    glutKeyboardFunc(Game::keyDownCallback);
+    glutKeyboardUpFunc(Game::keyUpCallback);
 }
 
 void Game::Run()
@@ -58,7 +64,7 @@ void Game::Update()
 {
     glutPostRedisplay(); //Tell openGL the scene has been changed and therefore needs redrawing.
 
-    float deltaT = 0.05;
+    float deltaT = Globals::timeStep;
 
     for(int i = 0; i < MAX_UPDATABLES; i++)
     {
@@ -100,6 +106,21 @@ void Game::Reshape(GLint width, GLint height)
     this->camera->SetProjection((float) width / height);
 }
 
+void Game::KeyUp(char Key, GLint x, GLint y)
+{
+    for(int i = 0; i < MAX_KEYEVENTS; i++)
+    {
+        if(this->keyboardEvents[i] != NULL) this->keyboardEvents[i]->keyReleased(Key, x, y);
+    }
+}
+void Game::KeyDown(char Key, GLint x, GLint y)
+{
+    for(int i = 0; i < MAX_KEYEVENTS; i++)
+    {
+        if(this->keyboardEvents[i] != NULL) this->keyboardEvents[i]->keyPressed(Key, x, y);
+    }
+}
+
 void Game::Report(const string message)
 {
     cout << message << '\n';
@@ -133,10 +154,10 @@ uint Game::RegisterDrawable(Drawable* drawable, string name)
         uint index;
         for(int i = 0; i < MAX_DRAWABLES; i++) //Scan through the list to find a space
         {
-            if(drawables[i] == NULL) //if you find one
+            if(this->drawables[i] == NULL) //if you find one
             {
                 index = i; //remember where you put it
-                drawables[i] = drawable; //put it there
+                this->drawables[i] = drawable; //put it there
                 success = true; //remember that you put it
                 break; //stop looking
             }
@@ -164,10 +185,10 @@ uint Game::RegisterLight(Light* light, string name)
         uint index;
         for(int i = 0; i < MAX_LIGHTS; i++) //Scan through the list to check if the drawable is in there.
         {
-            if(lights[i] == NULL)
+            if(this->lights[i] == NULL)
             {
                 index == i;
-                lights[i] = light;
+                this->lights[i] = light;
                 success = true;
                 break;
             }
@@ -177,7 +198,7 @@ uint Game::RegisterLight(Light* light, string name)
     }
 }
 
-uint Game::RegisterUpdatable(Updatable* updatable, string name)
+uint Game::RegisterUpdatable(Updatable* updatable)
 {
     bool isAlreadyRegistered = false;
     for(int i = 0; i < MAX_UPDATABLES; i++) //Scan through the list to check if the drawable is in there.
@@ -186,7 +207,7 @@ uint Game::RegisterUpdatable(Updatable* updatable, string name)
     }
     if(isAlreadyRegistered)
     {
-        Game::Warn("Drawable already registered: " + name);
+        Game::Warn("Drawable already registered: " + updatable->name);
     }
     else
     {
@@ -194,15 +215,45 @@ uint Game::RegisterUpdatable(Updatable* updatable, string name)
         uint index;
         for(int i = 0; i < MAX_UPDATABLES; i++) //Scan through the list to find a space
         {
-            if(updatables[i] == NULL) //if you find one
+            if(this->updatables[i] == NULL) //if you find one
             {
                 index = i; //remember where you put it
-                updatables[i] = updatable; //put it there
+                this->updatables[i] = updatable; //put it there
                 success = true; //remember that you put it
                 break; //stop looking
             }
         }
-        if(!success) Game::Fatal("Updatable memory full. Could not add " + name + "."); //if there was no space, panic!
+        if(!success) Game::Fatal("Updatable memory full. Could not add " + updatable->name + "."); //if there was no space, panic!
+        else return index; //give back the index so we can deassign
+    }
+}
+
+uint Game::RegisterKeyboardEvent(KeyboardEvent* event, string name)
+{
+    bool isAlreadyRegistered = false;
+    for(int i = 0; i < MAX_KEYEVENTS; i++) //Scan through the list to check if the drawable is in there.
+    {
+        isAlreadyRegistered = isAlreadyRegistered | (event == this->keyboardEvents[i]);
+    }
+    if(isAlreadyRegistered)
+    {
+        Game::Warn("Keyboard event already registered: " + name);
+    }
+    else
+    {
+        bool success = false;
+        uint index;
+        for(int i = 0; i < MAX_KEYEVENTS; i++) //Scan through the list to find a space
+        {
+            if(this->keyboardEvents[i] == NULL) //if you find one
+            {
+                index = i; //remember where you put it
+                this->keyboardEvents[i] = event; //put it there
+                success = true; //remember that you put it
+                break; //stop looking
+            }
+        }
+        if(!success) Game::Fatal("Keyboard event memory full. Could not add " + name + "."); //if there was no space, panic!
         else return index; //give back the index so we can deassign
     }
 }
@@ -212,9 +263,9 @@ void Game::UnregisterDrawable(Drawable* drawable)
     bool success = false;
     for (int i = 0; i < MAX_DRAWABLES; i++)
     {
-        if(drawable == drawables[i])
+        if(drawable == this->drawables[i])
         {
-            drawables[i] = NULL;
+            this->drawables[i] = NULL;
             success = true;
             //note, we don't break this way if any duplicate additions happen they are removed.
         }
@@ -228,9 +279,9 @@ void Game::UnregisterLight(Light* light)
     bool success = false;
     for (int i = 0; i < MAX_LIGHTS; i++)
     {
-        if(light = lights[i])
+        if(light == this->lights[i])
         {
-            lights[i] = NULL;
+            this->lights[i] = NULL;
             success = true;
             //note, we don't break this way if any duplicate additions happen they are removed.
         }
@@ -243,9 +294,24 @@ void Game::UnregisterUpdatable(Updatable* updatable)
     bool success = false;
     for (int i = 0; i < MAX_UPDATABLES; i++)
     {
-        if(updatable = updatables[i])
+        if(updatable == this->updatables[i])
         {
-            updatables[i] = NULL;
+            this->updatables[i] = NULL;
+            success = true;
+            //note, we don't break this way if any duplicate additions happen they are removed.
+        }
+    }
+    if (!success) Game::Warn("Tried to remove non existent updatable: " + updatable->name);
+}
+
+void Game::UnregisterKeyboardEvent(KeyboardEvent* event)
+{
+    bool success = false;
+    for (int i = 0; i < MAX_KEYEVENTS; i++)
+    {
+        if(event == this->keyboardEvents[i])
+        {
+            this->keyboardEvents[i] = NULL;
             success = true;
             //note, we don't break this way if any duplicate additions happen they are removed.
         }
@@ -266,4 +332,14 @@ void Game::reshapeCallback(GLint width, GLint height)
 void Game::idleCallback()
 {
     game->Update();
+}
+
+void Game::keyUpCallback(unsigned char Key, GLint x, GLint y)
+{
+    game->KeyUp(Key, x, y);
+}
+
+void Game::keyDownCallback(unsigned char Key, GLint x, GLint y)
+{
+    game->KeyDown(Key, x, y);
 }
