@@ -16,6 +16,16 @@ class Drawable
     private:
 };
 
+class CompoundDrawable : public Drawable
+{
+    public:
+        Drawable** children;
+        CompoundDrawable(uint numChildren);
+        virtual ~CompoundDrawable();
+        virtual void Draw();
+    protected:
+        uint size;
+};
 
 class Teapot : public Drawable
 {

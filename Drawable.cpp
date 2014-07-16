@@ -21,6 +21,26 @@ void Drawable::Translate() //Perform the default translation.
     glScalef(this->scale, this->scale, this->scale);
 }
 
+CompoundDrawable::CompoundDrawable(uint numChildren)
+{
+    this->size = numChildren;
+    this->children = (Drawable**) malloc(this->size * sizeof(Drawable*));
+}
+
+CompoundDrawable::~CompoundDrawable()
+{
+    free(this->children);
+}
+
+void CompoundDrawable::Draw()
+{
+    this->Translate();
+    for(int i = 0; i < this->size; i++)
+    {
+        this->children[i]->Draw();
+    }
+}
+
 Teapot::Teapot() //Teapot is simple, it just uses the default constructor
 {
 

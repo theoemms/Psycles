@@ -10,6 +10,8 @@ Teapot* teapot2;
 Triangle* triangle;
 Plane* plane;
 
+CompoundDrawable* teapotStack;
+
 Light* light1, * light2;
 
 void cleanup()
@@ -22,8 +24,6 @@ int main(int argc, char **argv) //Nice and general, all implementation details a
     atexit(cleanup);
     game = new Game();
     game->Initiallise(argc, argv);
-
-    Game::Report("");
 
     light1 = new Light(Vector3(1, 20, 2), false, GL_LIGHT0);
     light1->SetAmbientColour(0, 0, 0.1f, 1);
@@ -47,22 +47,30 @@ int main(int argc, char **argv) //Nice and general, all implementation details a
 
     teapot2->position = Vector3(2, 2, 2);
 
+    teapotStack = new CompoundDrawable(2);
+    teapotStack->children[0] = teapot;
+    teapotStack->children[1] = teapot2;
+
     ScaleAnimation* moveCam = new ScaleAnimation(&game->camera->position.z, -2, "Camera forwards animation");
     OnKeyHold* moveCamEvent = new OnKeyHold('w', moveCam);
 
     ScaleAnimation* moveCamBack = new ScaleAnimation(&game->camera->position.z, 2, "Camera backwards animation");
     OnKeyHold* moveCamBackEvent = new OnKeyHold('s', moveCamBack);
 
-    game->RegisterDrawable(teapot2, "another teapot");
-    game->RegisterDrawable(teapot, "Teapot");
+    ScaleAnimation* growTeapots = new ScaleAnimation(&teapotStack->rotation.y, 5, "GrowTeapots");
+
+    game->RegisterDrawable(teapotStack, "teapotStack");
     game->RegisterDrawable(triangle, "Triangle");
     game->RegisterDrawable(plane, "Plane");
+    game->RegisterUpdatable(growTeapots);
     game->RegisterLight(light1, "Sun");
     game->RegisterLight(light2, "Sky Reflection");
     game->RegisterKeyboardEvent(moveCamEvent, "Move camera forwards.");
     game->RegisterKeyboardEvent(moveCamBackEvent, "Move camera backwards.");
 
     game->Run();
+
+    delete moveCam, moveCamEvent, moveCamBack, moveCamBackEvent;
 
     return 0;
 }

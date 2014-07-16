@@ -27,6 +27,10 @@ Game::Game()
 
 Game::~Game()
 {
+    free(updatables);
+    free(drawables);
+    free(keyboardEvents);
+    free(lights);
     delete this->camera;
 }
 
@@ -39,7 +43,7 @@ void Game::Initiallise(int argc, char **argv)
     glutInitWindowSize(500, 500);
     glutCreateWindow("Psycles - Non euclidean horror.");
 
-    this->camera = new Camera(Vector3(2, 0, 16), Vector3(0, 0, 0), true, 45, 3, 50);
+    this->camera = new Camera(Vector3(2, 0, 16), Vector3(0, 0, 0), true, 45, 0.5f, 50);
 
     glEnable(GL_LIGHTING);      //Let there be light
     glEnable(GL_DEPTH_TEST);    //Let there be depth testing!
@@ -113,6 +117,7 @@ void Game::KeyUp(char Key, GLint x, GLint y)
         if(this->keyboardEvents[i] != NULL) this->keyboardEvents[i]->keyReleased(Key, x, y);
     }
 }
+
 void Game::KeyDown(char Key, GLint x, GLint y)
 {
     for(int i = 0; i < MAX_KEYEVENTS; i++)
