@@ -25,3 +25,6 @@
 *.cbp
 *.layout
 psycles
+
+#Silly Mac Files...
+.DS_Store
