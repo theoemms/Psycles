@@ -1,5 +1,5 @@
 #include "includes.h"
-
+#include<string>
 Camera::Camera(Vector3 Position, Vector3 TargOrRot, bool Track, GLfloat FOV, GLfloat near, GLfloat far)
 {
     this->position = Position;
@@ -15,6 +15,7 @@ Camera::Camera(Vector3 Position, Vector3 TargOrRot, bool Track, GLfloat FOV, GLf
         this->trackTarget = Vector3(0, 0, 0);
         this->rotation = TargOrRot;
     }
+    
     this->fieldOfView = FOV;
     this->tracking = Track;
     this->nearDistance = near;
@@ -47,4 +48,42 @@ void Camera::SetProjection(GLfloat aspectRatio)
 Camera::~Camera()
 {
     //dtor
+}
+
+FlythroughCamera::FlythroughCamera(Vector3 position, float theta0, float phi0, float Sensitivity, float Speed, float FOV, float near, float far) : Camera(position, Vector3(0, 0, 0), false, FOV, near, far)
+{
+    //Set initial values of theta and phi.
+    this->theta = theta0;
+    this->phi = phi0;
+    
+    this->sensitivity = Sensitivity;
+    this->speed = Speed;
+    
+    //Set up the keyboard input and register them in the game.
+    this->rotateLeftAnim = new ScaleAnimation(&this->phi, this->sensitivity, "Camera Rotate Left");
+    this->rotateRightAnim = new ScaleAnimation(&this->phi, -this->sensitivity, "Camera Rotate Right");
+    this->rotateUpAnim = new ClampedScaleAnimation(&this->theta, this->sensitivity, 90, -90, "Camera Rotate Up");
+    this->rotateDownAnim = new ClampedScaleAnimation(&this->theta, -this->sensitivity, 90, -90, "Camera Rotate Down");
+    this->translateForwardsAnim = new SphPolarVectorAddAnimation(&this->position, &this->theta, &this->phi, -this->speed, "Camera Translate Forwards");
+    
+    this->forwardsKey = new OnKeyHold(' ', translateForwardsAnim);
+    this->rotateLeftKey = new OnKeyHold('a', rotateLeftAnim);
+    this->rotateRightKey = new OnKeyHold('d', rotateRightAnim);
+    this->rotateUpKey = new OnKeyHold('s', rotateUpAnim);
+    this->rotateDownKey = new OnKeyHold('w', rotateDownAnim);
+    
+    game->RegisterKeyboardEvent(forwardsKey, "Camera Forwards Key");
+    game->RegisterKeyboardEvent(rotateLeftKey, "Camera Rotate Left Key");
+    game->RegisterKeyboardEvent(rotateRightKey, "Camera Rotate Right Key");
+    game->RegisterKeyboardEvent(rotateUpKey, "Camera Rotate Up Key");
+    game->RegisterKeyboardEvent(rotateDownKey, "Camera Rotate Down Key");
+}
+
+FlythroughCamera::~FlythroughCamera(){}
+
+void FlythroughCamera::Translate()
+{
+    glRotatef(-this->theta, 1, 0, 0);
+    glRotatef(-this->phi, 0, 1, 0);
+    glTranslatef(-this->position.x, -this->position.y, -this->position.z);
 }

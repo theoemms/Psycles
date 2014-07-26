@@ -43,7 +43,7 @@ void Game::Initiallise(int argc, char **argv)
     glutInitWindowSize(500, 500);
     glutCreateWindow("Psycles - Non euclidean horror.");
 
-    this->camera = new Camera(Vector3(2, 0, 16), Vector3(0, 0, 0), true, 45, 0.5f, 50);
+    this->camera = new FlythroughCamera(Vector3(2, 0, 16), 0, 0, 18, 5, 45, 0.5f, 50);
 
     glEnable(GL_LIGHTING);      //Let there be light
     glEnable(GL_DEPTH_TEST);    //Let there be depth testing!

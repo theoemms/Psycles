@@ -2,6 +2,8 @@
 #include <sstream>
 #include <string>
 
+#include<math.h>
+
 using namespace std;
 
 Vector3::Vector3(float X, float Y, float Z) //Constructor
@@ -111,4 +113,11 @@ Vector3 operator*(const Vector3 lhs, const float rhs)
 Vector3 operator*(const float lhs, const Vector3 rhs)
 {
     return rhs * lhs;
+}
+
+Vector3 Vector3::fromSpherical(float rho, float theta, float phi)
+{
+    return Vector3(rho * cos(theta * 3.14159f / 180) * sin(phi * 3.14159f / 180),
+                   -rho * sin(theta * 3.14159f / 180),
+                   rho * cos(theta * 3.14159f / 180) * cos(phi * 3.14159f / 180));
 }
