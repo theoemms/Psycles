@@ -50,7 +50,7 @@ Camera::~Camera()
     //dtor
 }
 
-FlythroughCamera::FlythroughCamera(Vector3 position, float theta0, float phi0, float Sensitivity, float Speed, float FOV, float near, float far) : Camera(position, Vector3(0, 0, 0), false, FOV, near, far)
+FlythroughCamera::FlythroughCamera(Vector3 position, float theta0, float phi0, float Sensitivity, float Speed, float FOV, float near, float far) : Camera(position, Vector3(0, 0, 0), true, FOV, near, far)
 {
     //Set initial values of theta and phi.
     this->theta = theta0;

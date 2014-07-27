@@ -13,6 +13,19 @@ Updatable::~Updatable()
     //dtor
 }
 
+Vector3Report::Vector3Report(Vector3* vectorToReport, string name) : Updatable(name)
+{
+    this->vector = vectorToReport;
+}
+
+Vector3Report::~Vector3Report(){}
+
+void Vector3Report::Update(float timePassed)
+{
+    Game::Report(this->vector->ToString());
+    game->UnregisterUpdatable(this);
+}
+
 ScaleAnimation::ScaleAnimation(float* target, float Speed, string name) : Updatable(name)
 {
     this->var = target;

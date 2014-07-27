@@ -16,6 +16,15 @@ class Updatable
     private:
 };
 
+class Vector3Report : public Updatable
+{
+    public:
+        Vector3* vector;
+        Vector3Report(Vector3* vectorToReport, string name);
+        virtual ~Vector3Report();
+        virtual void Update(float timePassed);
+};
+
 class  ScaleAnimation : public Updatable
 {
     public:

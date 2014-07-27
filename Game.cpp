@@ -43,7 +43,7 @@ void Game::Initiallise(int argc, char **argv)
     glutInitWindowSize(500, 500);
     glutCreateWindow("Psycles - Non euclidean horror.");
 
-    this->camera = new FlythroughCamera(Vector3(2, 0, 16), 0, 0, 18, 5, 45, 0.5f, 50);
+    this->camera = new FlythroughCamera(Vector3(2, 0, 16), 0, 0, 18, 5, 45, 0.01f, 50);
 
     glEnable(GL_LIGHTING);      //Let there be light
     glEnable(GL_DEPTH_TEST);    //Let there be depth testing!
@@ -81,16 +81,18 @@ void Game::Draw()
 {
     glClearColor(0,0,0,1); //Set the background colour
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //delete the previous frame
-    glMatrixMode(GL_MODELVIEW); //Tell openGL we want to do transformations on the scene.
+    glMatrixMode(GL_MODELVIEW); //Tell OpenGL we want to do transformations on the scene.
     glLoadIdentity(); //Create a new matrix to work from.
 
     this->camera->Translate(); //Translate to Scene coordinates
 
+    glPushMatrix();
     for(int i = 0; i < MAX_LIGHTS; i++) //Set the lights positions.
     {
         if(this->lights[i] != NULL) this->lights[i]->GLSetPosition();
     }
-
+    glPopMatrix();
+    
     for(int i = 0; i < MAX_DRAWABLES; i++) //Iterate over all the objects we wish to draw.
     {
         if (this->drawables[i] != NULL)//If they exist, draw them.
@@ -176,7 +178,7 @@ uint Game::RegisterLight(Light* light, string name)
 {
     glEnable(light->lightNum);
     bool isAlreadyRegistered = false;
-    for(int i = 0; i < MAX_LIGHTS; i++) //Scan through the list to check if the drawable is in there.
+    for(int i = 0; i < MAX_LIGHTS; i++) //Scan through the list to check if the light is in there.
     {
         isAlreadyRegistered = isAlreadyRegistered | (light == this->lights[i]);
     }
@@ -192,7 +194,7 @@ uint Game::RegisterLight(Light* light, string name)
         {
             if(this->lights[i] == NULL)
             {
-                index == i;
+                index = i;
                 this->lights[i] = light;
                 success = true;
                 break;

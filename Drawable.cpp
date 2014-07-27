@@ -123,7 +123,7 @@ void Surface::Draw() //Iterate over points and draw.
     glDisableClientState(GL_VERTEX_ARRAY);
 }
 
-Triangle::Triangle()//This function is pretty self exaplanatory. It sets the triangle's vertices and makes it double sided.
+Triangle::Triangle()//This function is pretty self exaplanatory. It sets the triangle's vertices.
 {
     this->numPoints = 3;
     this->numIndices = 3;

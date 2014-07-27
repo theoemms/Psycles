@@ -118,6 +118,6 @@ Vector3 operator*(const float lhs, const Vector3 rhs)
 Vector3 Vector3::fromSpherical(float rho, float theta, float phi)
 {
     return Vector3(rho * cos(theta * 3.14159f / 180) * sin(phi * 3.14159f / 180),
-                   -rho * sin(theta * 3.14159f / 180),
+                   rho * sin(-theta * 3.14159f / 180),
                    rho * cos(theta * 3.14159f / 180) * cos(phi * 3.14159f / 180));
 }

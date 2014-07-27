@@ -8,7 +8,7 @@ Game* game;
 Teapot* teapot;
 Teapot* teapot2;
 Triangle* triangle;
-Plane* plane;
+Plane* planes[16];
 
 CompoundDrawable* teapotStack;
 
@@ -16,7 +16,7 @@ Light* light1, * light2;
 
 void cleanup()
 {
-    delete game, light1, light2, triangle, teapot, plane;
+    delete game, light1, light2, triangle, teapot;
 }
 
 int main(int argc, char **argv) //Nice and general, all implementation details abstracted out.
@@ -38,11 +38,15 @@ int main(int argc, char **argv) //Nice and general, all implementation details a
     teapot = new Teapot();
     teapot2 = new Teapot();
     triangle = new Triangle();
-    plane = new Plane();
-
-    plane->position.y = -1;
-    plane->scale = 10;
-
+    
+    for(int z = 0; z < 4; z++)
+        for(int x = 0; x < 4; x++)
+        {
+            planes[4*z + x] = new Plane();
+            planes[4*z + x]->position = Vector3((x - 2) * 2.5f, -0.8f, (z - 2) * 2.5f);
+            planes[4*z + x]->scale = 2.5f;
+        }
+     
     triangle->position.y = 2;
 
     teapot2->position = Vector3(2, 2, 2);
@@ -51,26 +55,20 @@ int main(int argc, char **argv) //Nice and general, all implementation details a
     teapotStack->children[0] = teapot;
     teapotStack->children[1] = teapot2;
 
-    ScaleAnimation* moveCam = new ScaleAnimation(&game->camera->position.z, -2, "Camera forwards animation");
-    OnKeyHold* moveCamEvent = new OnKeyHold('w', moveCam);
-
-    ScaleAnimation* moveCamBack = new ScaleAnimation(&game->camera->position.z, 2, "Camera backwards animation");
-    OnKeyHold* moveCamBackEvent = new OnKeyHold('s', moveCamBack);
-
     ScaleAnimation* growTeapots = new ScaleAnimation(&teapotStack->rotation.y, 5, "GrowTeapots");
-
+    
+    Vector3Report* reportCameraPosition = new Vector3Report(&game->camera->position, "Camera Position Reporter.");
+    OnKeyPress* reportCameraPositionEvent = new OnKeyPress('p', reportCameraPosition);
+    
     game->RegisterDrawable(teapotStack, "teapotStack");
     game->RegisterDrawable(triangle, "Triangle");
-    game->RegisterDrawable(plane, "Plane");
+    for(int i = 0; i < 16; i++)
+        game->RegisterDrawable(planes[i], "Plane");
     game->RegisterUpdatable(growTeapots);
     game->RegisterLight(light1, "Sun");
     game->RegisterLight(light2, "Sky Reflection");
-    game->RegisterKeyboardEvent(moveCamEvent, "Move camera forwards.");
-    game->RegisterKeyboardEvent(moveCamBackEvent, "Move camera backwards.");
-
+    game->RegisterKeyboardEvent(reportCameraPositionEvent, "Report Camera Position");
     game->Run();
-
-    delete moveCam, moveCamEvent, moveCamBack, moveCamBackEvent;
 
     return 0;
 }
