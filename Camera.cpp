@@ -79,7 +79,20 @@ FlythroughCamera::FlythroughCamera(Vector3 position, float theta0, float phi0, f
     game->RegisterKeyboardEvent(rotateDownKey, "Camera Rotate Down Key");
 }
 
-FlythroughCamera::~FlythroughCamera(){}
+FlythroughCamera::~FlythroughCamera()
+{
+    delete this->forwardsKey;
+    delete this->rotateLeftKey;
+    delete this->rotateRightKey;
+    delete this->rotateUpKey;
+    delete this->rotateDownKey;
+    
+    delete this->rotateLeftAnim;
+    delete this->rotateRightAnim;
+    delete this->rotateUpAnim;
+    delete this->rotateDownAnim;
+    delete this->translateForwardsAnim;
+}
 
 void FlythroughCamera::Translate()
 {
