@@ -65,50 +65,73 @@ Surface::Surface() //Nothing to be done. (This should allow an array of points a
 {
 }
 
+Surface::Surface(Vector3* pointData, Vector3* normalData, GLuint* indexData)
+{
+    this->numPoints = sizeof(pointData) / sizeof(Vector3);
+    this->points = pointData;
+    this->normals = normalData;
+    this->indices = indexData;
+    
+    this->GenBuffers();
+}
+
+void Surface::GenBuffers()
+{
+    GLfloat* glPoint;
+    GLfloat* glNormal;
+    
+    this->pointsBuffer = (GLfloat*) malloc(3 * this->numPoints * sizeof(GLfloat));
+    this->normalsBuffer = (GLfloat*) malloc(3 * this->numPoints * sizeof(GLfloat));
+    
+    for (int i = 0; i < this->numPoints; i++) //Go through the vertices in order
+    {
+        glPoint = this->points[i].ToGLFloat3(); //Make our Vector3 into a Glfloat3*
+        glNormal = this->normals[i].ToGLFloat3();
+        
+        this->pointsBuffer[3 * i]       = glPoint[0];
+        this->pointsBuffer[3 * i + 1]   = glPoint[1];
+        this->pointsBuffer[3 * i + 2]   = glPoint[2];
+        
+        this->normalsBuffer[3 * i]       = glNormal[0];
+        this->normalsBuffer[3 * i + 1]   = glNormal[1];
+        this->normalsBuffer[3 * i + 2]   = glNormal[2];
+        
+        free(glPoint); //Free the memory
+        free(glNormal);
+    }
+}
+
 Surface::~Surface() //The points and normals are set by malloc so must be freed
 {
     free(this->points);
     free(this->normals);
+    free(this->indices);
+    free(this->pointsBuffer);
+    free(this->normalsBuffer);
 }
 
 void Surface::Draw() //Iterate over points and draw.
 {
     this->Translate();
-    glBegin(GL_TRIANGLES);
-
-    //We must save these pointers so that they can be freed
-    GLfloat* glPoint;
-    GLfloat* glNormal;
-        for (int i = 0; i < this->numPoints; i++) //Go through the vertices in order
-        {
-            glPoint = this->points[i].ToGLFloat3(); //Make our Vector3 into a Glfloat3*
-            glNormal = this->normals[i].ToGLFloat3();
-            glNormal3fv(glNormal); //Set the corresponding normal
-            glVertex3fv(glPoint); //Draw the vertex
-            free(glPoint); //Free the memory
-            free(glNormal);
-        }
-    if(this->doubleSided) //If the surface is two sided draw all the faces again but facing backwards
-    {
-        for (int i = this->numPoints - 1; i >=0 ; i--)//Go through vertices backwards
-        {
-            glPoint = this->points[i].ToGLFloat3();
-            glNormal = (-this->normals[i]).ToGLFloat3(); //Draw with normals reversed
-            glNormal3fv(glNormal);
-            glVertex3fv(glPoint);
-            free(glPoint);
-            free(glNormal);
-        }
-    }
-    glEnd();
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_NORMAL_ARRAY);
+        glVertexPointer(3, GL_FLOAT, 0, this->pointsBuffer);
+        glNormalPointer(GL_FLOAT, 0, this->normalsBuffer);
+    
+        glDrawElements(GL_TRIANGLES, this->numIndices, GL_UNSIGNED_INT, this->indices);
+    glDisableClientState(GL_NORMAL_ARRAY);
+    glDisableClientState(GL_VERTEX_ARRAY);
 }
 
 Triangle::Triangle()//This function is pretty self exaplanatory. It sets the triangle's vertices and makes it double sided.
 {
     this->numPoints = 3;
-    this->points = (Vector3*) malloc(sizeof(Vector3) * numPoints);
-    this->normals = (Vector3*) malloc(sizeof(Vector3) * numPoints);
-
+    this->numIndices = 3;
+    
+    this->points = (Vector3*) malloc(sizeof(Vector3) * this->numPoints);
+    this->normals = (Vector3*) malloc(sizeof(Vector3) * this->numPoints);
+    this->indices = (GLuint*) malloc(this->numIndices * sizeof(GLuint));
+    
     this->points[0] = Vector3(-1, 0, 0);
     this->normals[0] = Vector3(0, 0, 1);
 
@@ -118,7 +141,11 @@ Triangle::Triangle()//This function is pretty self exaplanatory. It sets the tri
     this->points[2] = Vector3(0, 1, 0);
     this->normals[2] = Vector3(0, 0, 1);
 
-    this->doubleSided = true;
+    this->indices[0] = 0;
+    this->indices[1] = 1;
+    this->indices[2] = 2;
+
+    this->GenBuffers();
 }
 
 Triangle::~Triangle()
@@ -128,29 +155,34 @@ Triangle::~Triangle()
 
 Plane::Plane()
 {
-    this->numPoints = 6;
-    this->points = (Vector3*) malloc(sizeof(Vector3) * numPoints);
-    this->normals = (Vector3*) malloc(sizeof(Vector3) * numPoints);
-
+    this->numPoints = 4;
+    this->numIndices = 6;
+    
+    this->points = (Vector3*) malloc(sizeof(Vector3) * this->numPoints);
+    this->normals = (Vector3*) malloc(sizeof(Vector3) * this->numPoints);
+    this->indices = (GLuint*) malloc(this->numIndices * sizeof(GLuint));
+    
     this->points[0] = Vector3(-1, 0, -1);
     this->normals[0] = Vector3(0, 1, 0);
-
-    this->points[2] = Vector3(1, 0, -1);
-    this->normals[2] = Vector3(0, 1, 0);
-
+    
     this->points[1] = Vector3(-1, 0, 1);
     this->normals[1] = Vector3(0, 1, 0);
 
-    this->points[3] = Vector3(-1, 0, 1);
+    this->points[2] = Vector3(1, 0, 1);
+    this->normals[2] = Vector3(0, 1, 0);
+    
+    this->points[3] = Vector3(1, 0, -1);
     this->normals[3] = Vector3(0, 1, 0);
-
-    this->points[5] = Vector3(1, 0, -1);
-    this->normals[5] = Vector3(0, 1, 0);
-
-    this->points[4] = Vector3(1, 0, 1);
-    this->normals[4] = Vector3(0, 1, 0);
-
-    this->doubleSided = false;
+    
+    this->indices[0] = 0;
+    this->indices[1] = 1;
+    this->indices[2] = 3;
+    
+    this->indices[3] = 1;
+    this->indices[4] = 2;
+    this->indices[5] = 3;
+    
+    this->GenBuffers();
 }
 
 Plane::~Plane()

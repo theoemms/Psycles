@@ -40,14 +40,25 @@ class Teapot : public Drawable
 class Surface : public Drawable
 {
   public:
-    uint numPoints;
     bool doubleSided;
     Surface();
+    Surface(Vector3* pointData, Vector3* normalData, GLuint* indexData);
     virtual ~Surface();
     virtual void Draw();
+    Surface Subdivide(uint n);
   protected:
+    uint numPoints;
+    uint numIndices;
+    
     Vector3* points;
+    GLfloat* pointsBuffer;
+    
     Vector3* normals;
+    GLfloat* normalsBuffer;
+    
+    GLuint* indices;
+    
+    void GenBuffers();
 };
 
 class Triangle : public Surface
