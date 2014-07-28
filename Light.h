@@ -1,17 +1,20 @@
 #ifndef LIGHT_H
 #define LIGHT_H
 #include "includes.h"
+#include <string.h>
 
+using namespace std;
 
 class Light
 {
     public:
+        string name;
         GLenum lightNum;
 
         Vector3 position;
         bool directional;
 
-        Light(Vector3 Position, bool isDirectional, GLenum lightNumber);
+        Light(Vector3 Position, bool isDirectional, GLenum lightNumber, string Name);
         virtual ~Light();
         void Initialize();
 

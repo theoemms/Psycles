@@ -1,14 +1,18 @@
 #ifndef DRAWABLE_H
 #define DRAWABLE_H
 #include "includes.h"
+#include <string.h>
+
+using namespace std;
 
 class Drawable
 {
     public:
+        string name;
         Vector3 position;
         Vector3 rotation;
         float scale;
-        Drawable();
+        Drawable(string Name);
         virtual ~Drawable();
         virtual void Draw() = 0;
         virtual void Translate();
@@ -20,7 +24,7 @@ class CompoundDrawable : public Drawable
 {
     public:
         Drawable** children;
-        CompoundDrawable(uint numChildren);
+        CompoundDrawable(uint numChildren, string name);
         virtual ~CompoundDrawable();
         virtual void Draw();
     protected:
@@ -30,7 +34,7 @@ class CompoundDrawable : public Drawable
 class Teapot : public Drawable
 {
   public:
-    Teapot();
+    Teapot(string name);
     virtual ~Teapot();
     virtual void Draw();
   protected:
@@ -41,8 +45,8 @@ class Surface : public Drawable
 {
   public:
     bool doubleSided;
-    Surface();
-    Surface(Vector3* pointData, Vector3* normalData, GLuint* indexData);
+    Surface(string name);
+    Surface(Vector3* pointData, Vector3* normalData, GLuint* indexData, string name);
     virtual ~Surface();
     virtual void Draw();
     Surface Subdivide(uint n);
@@ -64,14 +68,14 @@ class Surface : public Drawable
 class Triangle : public Surface
 {
   public:
-    Triangle();
+    Triangle(string name);
     virtual ~Triangle();
 };
 
 class Plane : public Surface
 {
 public:
-    Plane();
+    Plane(string name);
     virtual ~Plane();
 };
 #endif // DRAWABLE_H

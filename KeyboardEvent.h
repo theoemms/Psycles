@@ -1,11 +1,14 @@
 #ifndef KEYBOARDEVENT_H
 #define KEYBOARDEVENT_H
+#include <string.h>
 
+using namespace std;
 
 class KeyboardEvent
 {
     public:
-        KeyboardEvent();
+        string name;
+        KeyboardEvent(string Name);
         virtual ~KeyboardEvent();
         virtual void keyPressed(unsigned char key, GLint x, GLint y) = 0;
         virtual void keyReleased(unsigned char key, GLint x, GLint y) = 0;
@@ -19,7 +22,7 @@ class OnKeyPress : public KeyboardEvent
         Updatable* action;
         unsigned char key;
         bool keyAlreadyPressed;
-        OnKeyPress(unsigned char Key, Updatable* Action);
+        OnKeyPress(unsigned char Key, Updatable* Action, string name);
         virtual ~OnKeyPress();
         virtual void keyPressed(unsigned char Key, GLint x, GLint y);
         virtual void keyReleased(unsigned char Key, GLint x, GLint y);
@@ -33,7 +36,7 @@ class OnKeyRelease : public KeyboardEvent
         Updatable* action;
         unsigned char key;
         bool keyAlreadyPressed;
-        OnKeyRelease(unsigned char Key, Updatable* Action);
+        OnKeyRelease(unsigned char Key, Updatable* Action, string name);
         virtual ~OnKeyRelease();
         virtual void keyPressed(unsigned char Key, GLint x, GLint y);
         virtual void keyReleased(unsigned char Key, GLint x, GLint y);
@@ -47,7 +50,7 @@ class OnKeyHold : public KeyboardEvent
         Updatable* action;
         unsigned char key;
         bool keyAlreadyPressed;
-        OnKeyHold(unsigned char Key, Updatable* Action);
+        OnKeyHold(unsigned char Key, Updatable* Action, string name);
         virtual ~OnKeyHold();
         virtual void keyPressed(unsigned char key, GLint x, GLint y);
         virtual void keyReleased(unsigned char key, GLint x, GLint y);

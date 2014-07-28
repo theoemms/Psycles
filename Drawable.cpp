@@ -1,7 +1,8 @@
 #include "includes.h"
 
-Drawable::Drawable() //Set the position and rotation to (0, 0, 0)
+Drawable::Drawable(string name) //Set the position and rotation to (0, 0, 0)
 {
+    this->name = name;
     this->position = Vector3(0, 0, 0);
     this->rotation = Vector3(0, 0, 0);
     this->scale = 1;
@@ -21,7 +22,7 @@ void Drawable::Translate() //Perform the default translation.
     glScalef(this->scale, this->scale, this->scale);
 }
 
-CompoundDrawable::CompoundDrawable(uint numChildren)
+CompoundDrawable::CompoundDrawable(uint numChildren, string name) : Drawable(name)
 {
     this->size = numChildren;
     this->children = (Drawable**) malloc(this->size * sizeof(Drawable*));
@@ -41,7 +42,7 @@ void CompoundDrawable::Draw()
     }
 }
 
-Teapot::Teapot() //Teapot is simple, it just uses the default constructor
+Teapot::Teapot(string name) : Drawable(name) //Teapot is simple, it just uses the default constructor
 {
 
 }
@@ -61,11 +62,11 @@ void Teapot::Draw() //Draw a teapot (Assumes matrix mode is modelview and
 }
 
 
-Surface::Surface() //Nothing to be done. (This should allow an array of points and normals to be passed in)
+Surface::Surface(string name) : Drawable(name)
 {
 }
 
-Surface::Surface(Vector3* pointData, Vector3* normalData, GLuint* indexData)
+Surface::Surface(Vector3* pointData, Vector3* normalData, GLuint* indexData, string name) : Drawable(name)
 {
     this->numPoints = sizeof(pointData) / sizeof(Vector3);
     this->points = pointData;
@@ -123,7 +124,7 @@ void Surface::Draw() //Iterate over points and draw.
     glDisableClientState(GL_VERTEX_ARRAY);
 }
 
-Triangle::Triangle()//This function is pretty self exaplanatory. It sets the triangle's vertices.
+Triangle::Triangle(string name) : Surface(name)//This function is pretty self exaplanatory. It sets the triangle's vertices.
 {
     this->numPoints = 3;
     this->numIndices = 3;
@@ -153,7 +154,7 @@ Triangle::~Triangle()
 }
 
 
-Plane::Plane()
+Plane::Plane(string name) : Surface(name)
 {
     this->numPoints = 4;
     this->numIndices = 6;

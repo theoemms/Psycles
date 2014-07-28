@@ -35,10 +35,10 @@ class Game
         static void Fatal(const string error);
 
         //Register and unregister functions;
-        uint RegisterDrawable(Drawable* drawable, string name);
-        uint RegisterLight(Light* light, string name);
+        uint RegisterDrawable(Drawable* drawable);
+        uint RegisterLight(Light* light);
         uint RegisterUpdatable(Updatable* updatable);
-        uint RegisterKeyboardEvent(KeyboardEvent* event, string name);
+        uint RegisterKeyboardEvent(KeyboardEvent* event);
 
         void UnregisterDrawable(Drawable* drawable);
         void UnregisterLight(Light* light);

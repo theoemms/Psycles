@@ -37,13 +37,14 @@ Game::~Game()
 void Game::Initiallise(int argc, char **argv)
 {
     //Set up GLUT
+    Game::Report(" -- Psycles Game Engine V0.1.0 -- ");
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH );
     glutInitWindowPosition(50,50);
     glutInitWindowSize(500, 500);
     glutCreateWindow("Psycles - Non euclidean horror.");
 
-    this->camera = new FlythroughCamera(Vector3(2, 0, 16), 0, 0, 18, 5, 45, 0.01f, 50);
+    this->camera = new FlythroughCamera(Vector3(2, 0, 16), 0, 0, 25, 4, 45, 0.01f, 50);
 
     glEnable(GL_LIGHTING);      //Let there be light
     glEnable(GL_DEPTH_TEST);    //Let there be depth testing!
@@ -135,17 +136,18 @@ void Game::Report(const string message)
 
 void Game::Warn(const string warning)
 {
-    Game::Report("Warning: " + warning);
+    Game::Report("Warning -  " + warning);
 }
 
 void Game::Fatal(const string error)
 {
-    Game::Report("Fatal: " + error);
+    Game::Report("Error   -  " + error);
     exit(1);
 }
 
-uint Game::RegisterDrawable(Drawable* drawable, string name)
+uint Game::RegisterDrawable(Drawable* drawable)
 {
+    uint index = NULL;
     bool isAlreadyRegistered = false;
     for(int i = 0; i < MAX_DRAWABLES; i++) //Scan through the list to check if the drawable is in there.
     {
@@ -153,12 +155,11 @@ uint Game::RegisterDrawable(Drawable* drawable, string name)
     }
     if(isAlreadyRegistered)
     {
-        Game::Warn("Drawable already registered: " + name);
+        Game::Warn("Drawable already registered: " + drawable->name + ".");
     }
     else
     {
         bool success = false;
-        uint index;
         for(int i = 0; i < MAX_DRAWABLES; i++) //Scan through the list to find a space
         {
             if(this->drawables[i] == NULL) //if you find one
@@ -169,13 +170,17 @@ uint Game::RegisterDrawable(Drawable* drawable, string name)
                 break; //stop looking
             }
         }
-        if(!success) Game::Fatal("Drawable memory full. Could not add " + name + "."); //if there was no space, panic!
-        else return index; //give back the index so we can deassign quickly
+        if(!success)
+        {
+            Game::Fatal("Drawable memory full. Could not add " + drawable->name + "."); //if there was no space, panic!
+        }
     }
+    return index;
 }
 
-uint Game::RegisterLight(Light* light, string name)
+uint Game::RegisterLight(Light* light)
 {
+    uint index = NULL;
     glEnable(light->lightNum);
     bool isAlreadyRegistered = false;
     for(int i = 0; i < MAX_LIGHTS; i++) //Scan through the list to check if the light is in there.
@@ -184,12 +189,11 @@ uint Game::RegisterLight(Light* light, string name)
     }
     if(isAlreadyRegistered)
     {
-        Game::Warn("Light already registered: " + name);
+        Game::Warn("Light already registered: " + light->name + ".");
     }
     else
     {
         bool success = false;
-        uint index;
         for(int i = 0; i < MAX_LIGHTS; i++) //Scan through the list to check if the drawable is in there.
         {
             if(this->lights[i] == NULL)
@@ -200,13 +204,14 @@ uint Game::RegisterLight(Light* light, string name)
                 break;
             }
         }
-        if(!success) Game::Fatal("Too many lights assigned!");
-        else return index;
+        if(!success) Game::Fatal("Light memory full. Could not add " + light->name + ".");
     }
+    return index;
 }
 
 uint Game::RegisterUpdatable(Updatable* updatable)
 {
+    uint index = NULL;
     bool isAlreadyRegistered = false;
     for(int i = 0; i < MAX_UPDATABLES; i++) //Scan through the list to check if the drawable is in there.
     {
@@ -214,12 +219,11 @@ uint Game::RegisterUpdatable(Updatable* updatable)
     }
     if(isAlreadyRegistered)
     {
-        Game::Warn("Drawable already registered: " + updatable->name);
+        Game::Warn("Updatable already registered: " + updatable->name + ".");
     }
     else
     {
         bool success = false;
-        uint index;
         for(int i = 0; i < MAX_UPDATABLES; i++) //Scan through the list to find a space
         {
             if(this->updatables[i] == NULL) //if you find one
@@ -231,12 +235,13 @@ uint Game::RegisterUpdatable(Updatable* updatable)
             }
         }
         if(!success) Game::Fatal("Updatable memory full. Could not add " + updatable->name + "."); //if there was no space, panic!
-        else return index; //give back the index so we can deassign
     }
+        return index; //give back the index so we can deassign quickly
 }
 
-uint Game::RegisterKeyboardEvent(KeyboardEvent* event, string name)
+uint Game::RegisterKeyboardEvent(KeyboardEvent* event)
 {
+    uint index = NULL;
     bool isAlreadyRegistered = false;
     for(int i = 0; i < MAX_KEYEVENTS; i++) //Scan through the list to check if the drawable is in there.
     {
@@ -244,12 +249,11 @@ uint Game::RegisterKeyboardEvent(KeyboardEvent* event, string name)
     }
     if(isAlreadyRegistered)
     {
-        Game::Warn("Keyboard event already registered: " + name);
+        Game::Warn("Keyboard event already registered: " + event->name + ".");
     }
     else
     {
         bool success = false;
-        uint index;
         for(int i = 0; i < MAX_KEYEVENTS; i++) //Scan through the list to find a space
         {
             if(this->keyboardEvents[i] == NULL) //if you find one
@@ -260,9 +264,9 @@ uint Game::RegisterKeyboardEvent(KeyboardEvent* event, string name)
                 break; //stop looking
             }
         }
-        if(!success) Game::Fatal("Keyboard event memory full. Could not add " + name + "."); //if there was no space, panic!
-        else return index; //give back the index so we can deassign
+        if(!success) Game::Fatal("Keyboard event memory full. Could not add " + event->name + "."); //if there was no space, panic!
     }
+    return index; //give back the index so we can deassign quickly
 }
 
 void Game::UnregisterDrawable(Drawable* drawable)
@@ -277,7 +281,7 @@ void Game::UnregisterDrawable(Drawable* drawable)
             //note, we don't break this way if any duplicate additions happen they are removed.
         }
     }
-    if (!success) Game::Warn("Tried to remove non existent drawable!");
+    if (!success) Game::Warn("Tried to remove non existent drawable: " + drawable->name + ".");
 }
 
 void Game::UnregisterLight(Light* light)
@@ -293,7 +297,7 @@ void Game::UnregisterLight(Light* light)
             //note, we don't break this way if any duplicate additions happen they are removed.
         }
     }
-    if (!success) Game::Warn("Tried to remove non existent light!");
+    if (!success) Game::Warn("Tried to remove non existent light: " + light->name + ".");
 }
 
 void Game::UnregisterUpdatable(Updatable* updatable)
@@ -308,7 +312,7 @@ void Game::UnregisterUpdatable(Updatable* updatable)
             //note, we don't break this way if any duplicate additions happen they are removed.
         }
     }
-    if (!success) Game::Warn("Tried to remove non existent updatable: " + updatable->name);
+    if (!success) Game::Warn("Tried to remove non existent updatable: " + updatable->name + ".");
 }
 
 void Game::UnregisterKeyboardEvent(KeyboardEvent* event)
@@ -323,7 +327,7 @@ void Game::UnregisterKeyboardEvent(KeyboardEvent* event)
             //note, we don't break this way if any duplicate additions happen they are removed.
         }
     }
-    if (!success) Game::Warn("Tried to remove non existent updatable!");
+    if (!success) Game::Warn("Tried to remove non existent keyboard event: " + event->name + ".");
 }
 
 void Game::drawCallback()

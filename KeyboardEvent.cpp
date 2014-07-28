@@ -1,8 +1,8 @@
 #include "includes.h"
 
-KeyboardEvent::KeyboardEvent()
+KeyboardEvent::KeyboardEvent(string Name)
 {
-    //ctor
+    this->name = Name;
 }
 
 KeyboardEvent::~KeyboardEvent()
@@ -10,7 +10,7 @@ KeyboardEvent::~KeyboardEvent()
     //dtor
 }
 
-OnKeyPress::OnKeyPress(unsigned char Key, Updatable* Action)
+OnKeyPress::OnKeyPress(unsigned char Key, Updatable* Action, string name) : KeyboardEvent(name)
 {
     this->key = Key;
     this->action = Action;
@@ -36,7 +36,7 @@ void OnKeyPress::keyReleased(unsigned char Key, GLint x, GLint y)
     }
 }
 
-OnKeyRelease::OnKeyRelease(unsigned char Key, Updatable* Action)
+OnKeyRelease::OnKeyRelease(unsigned char Key, Updatable* Action, string name) : KeyboardEvent(name)
 {
     this->key = Key;
     this->action = Action;
@@ -55,7 +55,7 @@ void OnKeyRelease::keyReleased(unsigned char Key, GLint x, GLint y)
     }
 }
 
-OnKeyHold::OnKeyHold(unsigned char Key, Updatable* Action)
+OnKeyHold::OnKeyHold(unsigned char Key, Updatable* Action, string name) : KeyboardEvent(name)
 {
     this->key = Key;
     this->action = Action;

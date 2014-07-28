@@ -65,18 +65,21 @@ FlythroughCamera::FlythroughCamera(Vector3 position, float theta0, float phi0, f
     this->rotateUpAnim = new ClampedScaleAnimation(&this->theta, this->sensitivity, 90, -90, "Camera Rotate Up");
     this->rotateDownAnim = new ClampedScaleAnimation(&this->theta, -this->sensitivity, 90, -90, "Camera Rotate Down");
     this->translateForwardsAnim = new SphPolarVectorAddAnimation(&this->position, &this->theta, &this->phi, -this->speed, "Camera Translate Forwards");
+    this->translateBackwardsAnim = new SphPolarVectorAddAnimation(&this->position, &this->theta, &this->phi, this->speed, "Camera Translate Backwarsds)");
     
-    this->forwardsKey = new OnKeyHold(' ', translateForwardsAnim);
-    this->rotateLeftKey = new OnKeyHold('a', rotateLeftAnim);
-    this->rotateRightKey = new OnKeyHold('d', rotateRightAnim);
-    this->rotateUpKey = new OnKeyHold('s', rotateUpAnim);
-    this->rotateDownKey = new OnKeyHold('w', rotateDownAnim);
+    this->forwardsKey = new OnKeyHold(' ', translateForwardsAnim, "Camera Forwards Key");
+    this->backwardsKey = new OnKeyHold('x', translateBackwardsAnim, "Camera Backwards Key");
+    this->rotateLeftKey = new OnKeyHold('a', rotateLeftAnim, "Camera Rotate Left Key");
+    this->rotateRightKey = new OnKeyHold('d', rotateRightAnim, "Camera Rotate Right Key");
+    this->rotateUpKey = new OnKeyHold('s', rotateUpAnim, "Camera Rotate Up Key");
+    this->rotateDownKey = new OnKeyHold('w', rotateDownAnim, "Camera Rotate Down Key");
     
-    game->RegisterKeyboardEvent(forwardsKey, "Camera Forwards Key");
-    game->RegisterKeyboardEvent(rotateLeftKey, "Camera Rotate Left Key");
-    game->RegisterKeyboardEvent(rotateRightKey, "Camera Rotate Right Key");
-    game->RegisterKeyboardEvent(rotateUpKey, "Camera Rotate Up Key");
-    game->RegisterKeyboardEvent(rotateDownKey, "Camera Rotate Down Key");
+    game->RegisterKeyboardEvent(forwardsKey);
+    game->RegisterKeyboardEvent(backwardsKey);
+    game->RegisterKeyboardEvent(rotateLeftKey);
+    game->RegisterKeyboardEvent(rotateRightKey);
+    game->RegisterKeyboardEvent(rotateUpKey);
+    game->RegisterKeyboardEvent(rotateDownKey);
 }
 
 FlythroughCamera::~FlythroughCamera()

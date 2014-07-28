@@ -1,7 +1,8 @@
 #include "includes.h"
 
-Light::Light(Vector3 Position, bool isDirectional, GLenum lightNumber)
+Light::Light(Vector3 Position, bool isDirectional, GLenum lightNumber, string Name)
 {
+    this->name = Name;
     this->directional = isDirectional;
     this->position = Position;
     this->lightNum = lightNumber;

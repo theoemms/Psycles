@@ -36,6 +36,7 @@ class FlythroughCamera : public Camera
     
     private:
         OnKeyHold* forwardsKey;
+        OnKeyHold* backwardsKey;
         OnKeyHold* rotateLeftKey;
         OnKeyHold* rotateRightKey;
         OnKeyHold* rotateUpKey;
@@ -46,6 +47,7 @@ class FlythroughCamera : public Camera
         ClampedScaleAnimation* rotateUpAnim;
         ClampedScaleAnimation* rotateDownAnim;
         SphPolarVectorAddAnimation* translateForwardsAnim;
+        SphPolarVectorAddAnimation* translateBackwardsAnim;
 };
 
 #endif // CAMERA_H
