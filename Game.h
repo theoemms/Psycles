@@ -1,10 +1,10 @@
 #ifndef GAME_H
 #define GAME_H
 
-#define MAX_DRAWABLES 32
+#define MAX_DRAWABLES 512
 #define MAX_LIGHTS 16
-#define MAX_UPDATABLES 64
-#define MAX_KEYEVENTS 32
+#define MAX_UPDATABLES 2048
+#define MAX_KEYEVENTS 512
 
 #include<string>
 
@@ -47,10 +47,10 @@ class Game
     protected:
     private:
         //The objects to be drawn, the lights to use in shading and any constraints to apply.
-        Drawable* drawables[MAX_DRAWABLES];
-        Light* lights[MAX_LIGHTS];
-        Updatable* updatables[MAX_UPDATABLES];
-        KeyboardEvent* keyboardEvents[MAX_KEYEVENTS];
+        Drawable** drawables;
+        Light** lights;
+        Updatable** updatables;
+        KeyboardEvent** keyboardEvents;
 
         //This is to make OpenGL play with C++... Messy. Essentially maps Update, Draw etc. to these static functions
         //(Means only one instance of Game can exist)

@@ -9,7 +9,7 @@ Game* game;
 Teapot* teapot;
 Teapot* teapot2;
 Triangle* triangle;
-Plane* planes[16];
+Plane* planes[16*16];
 
 CompoundDrawable* teapotStack;
 
@@ -40,14 +40,14 @@ int main(int argc, char **argv) //Nice and general, all implementation details a
     teapot2 = new Teapot("Teapot 2");
     triangle = new Triangle("Triangle");
     
-    for(int z = 0; z < 4; z++)
-        for(int x = 0; x < 4; x++)
+    for(int z = 0; z < 16; z++)
+        for(int x = 0; x < 16; x++)
         {
             std:ostringstream oss;
             oss << "Plane subdivision (" << x << ", " << z << ")";
-            planes[4*z + x] = new Plane(oss.str());
-            planes[4*z + x]->position = Vector3((x - 1.5f) * 2.5f, -0.8f, (z - 1.5f) * 2.5f);
-            planes[4*z + x]->scale = 1.25f;
+            planes[16*z + x] = new Plane(oss.str());
+            planes[16*z + x]->position = Vector3((x - 8) * 2, -0.8f, (z - 8) * 2);
+            planes[16*z + x]->scale = 1;
         }
      
     triangle->position.y = 2;
@@ -62,7 +62,7 @@ int main(int argc, char **argv) //Nice and general, all implementation details a
     
     game->RegisterDrawable(teapotStack);
     game->RegisterDrawable(triangle);
-    for(int i = 0; i < 16; i++)
+    for(int i = 0; i < 16 * 16; i++)
         game->RegisterDrawable(planes[i]);
     game->RegisterUpdatable(rotateTeapots);
     game->RegisterLight(light1);

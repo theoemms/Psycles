@@ -7,6 +7,11 @@ using namespace std;
 
 Game::Game()
 {
+    this->drawables = (Drawable**) malloc(sizeof(Drawable) * MAX_DRAWABLES);
+    this->updatables = (Updatable**) malloc(sizeof(Updatable) * MAX_UPDATABLES);
+    this->keyboardEvents = (KeyboardEvent**) malloc(sizeof(KeyboardEvent) * MAX_KEYEVENTS);
+    this->lights = (Light**) malloc(sizeof(Light) * MAX_LIGHTS);
+    
     for(int i = 0; i < MAX_DRAWABLES; i++) //Make sure that the Drawables are empty
     {
         this->drawables[i] = NULL;
